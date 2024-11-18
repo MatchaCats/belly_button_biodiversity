@@ -24,34 +24,67 @@ function buildMetadata(sample) {
   });
 }
 
-
 // function to build both charts
 function buildCharts(sample) {
   d3.json("https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/samples.json").then((data) => {
 
     // Get the samples field
-
+    let samples = data.samples;
 
     // Filter the samples for the object with the desired sample number
-
+    let result = samples.filter(sampleObj => sampleObj.id == sample);
+    let sampleData = result[0]; // Assuming there is only one match
 
     // Get the otu_ids, otu_labels, and sample_values
-
+    let otu_ids = sampleData.otu_ids;
+    let otu_labels = sampleData.otu_labels;
+    let sample_values = sampleData.sample_values;
 
     // Build a Bubble Chart
-
+    // Code for creating the Bubble Chart will go here
+    let bubbleData = [{
+      x: otu_ids,
+      y: sample_values,
+      mode: "markers",
+      marker: {
+        size: sample_values,
+        color: otu_ids,
+        colorscale: "Earth"
+      },
+      text: otu_labels
+    }];
 
     // Render the Bubble Chart
+    let bubbleLayout = {
+      title: "Bubble Chart of OTUs",
+      xaxis: { title: "OTU ID" },
+      yaxis: { title: "Sample Values" },
+      hovermode: "closest"
+    };
 
+    Plotly.newPlot("bubble", bubbleData, bubbleLayout); // Code for rendering the Bubble Chart will go here
 
     // For the Bar Chart, map the otu_ids to a list of strings for your yticks
-
+    let yticks = otu_ids.slice(0, 10).map(id => `OTU ${id}`).reverse();
 
     // Build a Bar Chart
     // Don't forget to slice and reverse the input data appropriately
-
+    let barData = {
+      x: sample_values.slice(0, 10).reverse(),
+      y: yticks,
+      type: 'bar',
+      orientation: 'h',
+      text: otu_labels.slice(0, 10).reverse()
+    };
 
     // Render the Bar Chart
+    let barLayout = {
+      title: "Top 10 OTUs Found",
+      xaxis: { title: "Sample Values" },
+      yaxis: { title: "OTU ID" }
+    };
+
+    Plotly.newPlot("bar", [barData], barLayout); // Code for rendering the Bar Chart will go here
 
   });
 }
